@@ -11,8 +11,10 @@
 
 #include <spdlog/spdlog.h>
 
+#include "NetworkConfiguration.h"
 #include "../../http/HttpRequestBuilder.h"
 #include "../../http/HttpResponse.h"
+#include "exceptions/ContainerAlreadyExistsException.h"
 #include "exceptions/ContainerDoesntExistException.h"
 #include "exceptions/DockerException.h"
 #include "exceptions/InvalidConfigException.h"
@@ -22,8 +24,8 @@ class ContainerConfigBuilder;
 using json = nlohmann::json;
 
 std::vector<ContainerConfig> Docker::listContainers() {
-    HttpResponse<json> result = sendRequest(GET, "/containers/json");
-    json body = result.getBody();
+    HttpResponse result = sendRequest(GET, "/containers/json");
+    json body = json::parse(result.getBody());
     std::vector<ContainerConfig> containers;
     for (const auto& item: body) {
         containers.push_back(ContainerConfig::fromJson(item));
@@ -46,7 +48,7 @@ ContainerInstance Docker::getContainer(std::string id) {
         }
     }
 
-    json body = result.getBody();
+    json body = json::parse(result.getBody());
     return ContainerInstance::fromJson(body);
 }
 
@@ -68,14 +70,15 @@ ContainerInstance Docker::createContainer(ContainerConfig *container) {
                 throw InvalidConfigException();
             }
             case Conflict: {
-                throw DockerException();
+                throw ContainerAlreadyExistsException("Container Already exists");
             }
             default:
                 throw DockerException();
         }
     }
 
-    json body = result.getBody();
+    json body = json::parse(result.getBody());
+    spdlog::debug("Successfully created container. Name: {}", container->hostName.value());
     return getContainer(body["Id"]);
 }
 
@@ -107,17 +110,30 @@ void Docker::killContainer(std::string id) {
     sendRequest(POST, endpoint);
 }
 
-HttpResponse<json> Docker::sendRequest(const RequestMethod method, const std::string &endpoint, const std::optional<std::string> &body) {
-    std::string URI = "http://localhost" + endpoint;
-    spdlog::debug("Sending request to docker socket. URI: {}", URI);
+/* Network */
 
-    HttpRequestBuilder request_builder = HttpRequestBuilder()
+void Docker::createNetwork(NetworkConfiguration network_configuration) {
+    spdlog::info("Creating network. Name: {}", network_configuration.name);
+    sendRequest(POST, "/networks/create", network_configuration.toJson().dump());
+}
+
+HttpResponse Docker::sendRequest(const RequestMethod method, const std::string &endpoint, const std::optional<std::string> &body) {
+    std::string URL = "http://localhost" + endpoint;
+    spdlog::debug("Sending request to docker socket. URL: {}", URL);
+
+    CURL* curl;
+    auto request_builder = HttpRequestBuilder()
         .method(method)
         .addHeader("Accept: application/json")
-        .setUnixSocket("/var/run/docker.sock")
-        .setURI(URI);
+        .setURL(URL);
+
+    if (this->socket.has_value()) {
+        spdlog::debug("Using docker socket: {}", this->socket.value());
+        request_builder = request_builder.setUnixSocket(this->socket.value());
+    }
 
     if (body.has_value()) {
+        spdlog::debug(body.value());
         request_builder = request_builder
             .addHeader("Content-Type: application/json")
             .setBody(body.value());
@@ -125,5 +141,5 @@ HttpResponse<json> Docker::sendRequest(const RequestMethod method, const std::st
 
     return request_builder
         .build()
-        .send<json>();
+        .send();
 }

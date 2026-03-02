@@ -4,13 +4,13 @@
 
 #include "ContainerConfigBuilder.h"
 
-#include <iostream>
-
-#include "../util/util.h"
+#include "../../util/util.h"
+#include "spdlog/spdlog.h"
 
 ContainerConfigBuilder::ContainerConfigBuilder() {}
 
 ContainerConfig ContainerConfigBuilder::build() {
+    spdlog::debug("Building docker container config");
     return this->container_config_;
 }
 
@@ -39,17 +39,18 @@ ContainerConfigBuilder& ContainerConfigBuilder::addExposedPort(PortMapping expos
     return *this;
 }
 
-ContainerConfigBuilder &ContainerConfigBuilder::setEnv(std::map<std::string, std::string> envs) {
+ContainerConfigBuilder &ContainerConfigBuilder::setEnv(std::vector<std::string> envs) {
     this->container_config_.env = envs;
     return *this;
 }
 
 ContainerConfigBuilder& ContainerConfigBuilder::addEnv(std::string key, std::string value) {
+    auto env_formatted = std::format("{}={}", key, value);
     if (this->container_config_.env.has_value()) {
-        this->container_config_.env.value()[key] = value;
+        this->container_config_.env->push_back(env_formatted);
     }
     else {
-        this->container_config_.env = std::map<std::string, std::string>{{key, value}};
+        this->container_config_.env = {env_formatted};
     }
     return *this;
 }
@@ -106,5 +107,51 @@ ContainerConfigBuilder& ContainerConfigBuilder::setStopTimeout(u_int64_t stop_ti
 
 ContainerConfigBuilder& ContainerConfigBuilder::setShell(std::string shell) {
     this->container_config_.shell = split(shell, " ");
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::setAttachStdin(bool value) {
+    this->container_config_.attachStdin = value;
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::setAttachStdout(bool value) {
+    this->container_config_.attachStdout = value;
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::setAttachStderr(bool value) {
+    this->container_config_.attachStderr = value;
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::setHostConfig(HostConfig host_config) {
+    this->container_config_.hostConfig = host_config;
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::addVolume(const std::string &volume) {
+    if (this->container_config_.volumes) {
+        this->container_config_.volumes.value().push_back(volume);
+    }
+    else {
+        this->container_config_.volumes = std::vector<std::string>{volume};
+    }
+
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::setVolumes(std::vector<std::string> volumes) {
+    this->container_config_.volumes = volumes;
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::addNetwork(const std::string &network) {
+    this->container_config_.networks[network] = std::nullopt;
+    return *this;
+}
+
+ContainerConfigBuilder &ContainerConfigBuilder::addNetwork(const std::string &network, NetworkingConfig networking_config) {
+    this->container_config_.networks[network] = networking_config;
     return *this;
 }

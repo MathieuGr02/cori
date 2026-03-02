@@ -11,7 +11,7 @@
 #include "ContainerConfig.h"
 #include "PortMapping.h"
 #include "State.h"
-#include "../util/JsonDeserializable.h"
+#include "../../util/JsonDeserializable.h"
 using json = nlohmann::json;
 
 class ContainerInstance : public JsonDeserializable<ContainerInstance> {

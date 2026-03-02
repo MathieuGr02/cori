@@ -5,24 +5,24 @@
 #ifndef CORI_CONFIG_H
 #define CORI_CONFIG_H
 
+#include "spdlog/common.h"
+#include "types/Object.h"
 #include "util/JsonDeserializable.h"
-
-enum LOG_LEVEL {
-    INFO,
-    TRACE,
-    DEBUG,
-    WARN,
-    ERROR
-};
 
 class Config:
     public JsonDeserializable<Config>
 {
-protected:
-    static Config fromJsonInternal(json j);
 
 public:
-    LOG_LEVEL log_level;
+    static Config fromJsonInternal(json j);
+
+    spdlog::level::level_enum log_level;
+    bool curl_verbose;
+
+    std::vector<Object> objects = {};
+
+    void spawnObject(Spawnable* object);
+    void spawnObjectVec(std::vector<Spawnable*> objects);
 };
 
 

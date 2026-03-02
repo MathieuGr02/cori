@@ -8,6 +8,7 @@
 
 
 class DockerException: public std::exception {
+
 };
 
 

@@ -16,11 +16,9 @@ json ContainerConfig::toJson() {
 
     spdlog::debug("Parsing ContainerConfig to JSON");
 
-    if (this->hostName.has_value()) { j["Hostname"] = this->hostName.value(); }
-
-    if (this->domainName) { j["Domainname"] = this->domainName.value(); }
-
-    if (this->user) { j["User"] = this->user.value(); }
+    j = setJson(j, "Hostname", &this->hostName);
+    j = setJson(j, "Domainname", &this->domainName);
+    j = setJson(j, "User", &this->user);
 
     if (this->exposedPorts.has_value()) {
         for (auto &port: this->exposedPorts.value()) {
@@ -29,97 +27,75 @@ json ContainerConfig::toJson() {
             j["ExposedPorts"][string_port] = json({});
         }
     }
-    if (this->env) {
-        std::vector<std::string> envs;
-        for (std::map<std::string, std::string>::iterator it = this->env->begin(); it != this->env->end(); ++it) {
-            envs.push_back(std::format("{}={}", it->first, it->second));
-        }
-        j["Env"] = envs;
+
+    j = setJson(j, "Env", &this->env);
+    j = setJson(j, "Cmd", &this->cmd);
+    j = setJson(j, "Image", &this->image);
+    j = setJson(j, "WorkingDir", &this->workingDir);
+    j = setJson(j, "Entrypoint", &this->entrypoint);
+    j = setJson(j, "NetworkDisabled", &this->networkDisabled);
+    j = setJson(j, "OnBuild", &this->onBuild);
+    j = setJson(j, "StopSignal", &this->stopSignal);
+    j = setJson(j, "StopTimeout", &this->stopTimeout);
+    j = setJson(j, "Shell", &this->shell);
+    j = setJson(j, "StopTimeout", &this->stopTimeout);
+
+    if (this->hostConfig) {
+        j["HostConfig"] = this->hostConfig.value().toJson();
     }
 
-    if (this->cmd) { j["Cmd"] = this->cmd.value(); }
+    if (this->volumes) {
+        for (const auto& volume: this->volumes.value()) {
+            j["Volumes"][volume] = json::object();
+        }
+    }
 
-    if (this->image) { j["Image"] = this->image.value(); }
+    if (!this->networks.empty()) {
+        for (auto network: this->networks) {
+            if (network.second) {
+                j["NetworkingConfig"]["EndpointsConfig"][network.first] = network.second.value().toJson();
+            }
+            else {
+                j["NetworkingConfig"]["EndpointsConfig"][network.first] = json::object();
+            }
+        }
+    }
 
-    if (this->workingDir) { j["WorkingDir"] = this->workingDir.value(); }
-
-    if (this->entrypoint) { j["Entrypoint"] = this->entrypoint.value(); }
-
-    if (this->networkDisabled) { j["NetworkDisabled"] = this->networkDisabled.value(); }
-
-    if (this->onBuild) { j["OnBuild"] = this->onBuild.value(); }
-
-    if (this->stopSignal) { j["StopSignal"] = this->stopSignal.value(); }
-
-    if (this->stopTimeout) { j["StopTimeout"] = this->stopTimeout.value(); }
-
-    if (this->shell) { j["Shell"] = this->shell.value(); }
+    j = setJson(j, "AttachStderr", &this->attachStderr);
+    j = setJson(j, "AttachStdin", &this->attachStdin);
+    j = setJson(j, "AttachStdout", &this->attachStdout);
 
     return j;
 }
 
 ContainerConfig ContainerConfig::fromJsonInternal(json j) {
-    spdlog::debug("Parsing JSON to ContainerConfig");
+    spdlog::trace("Parsing JSON to ContainerConfig");
 
     ContainerConfig config = ContainerConfig();
-    config.hostName = j["Hostname"];
-    config.domainName = j["Domainname"];
-    config.user = j["User"];
-    //config.exposedPorts = j["ExposedPorts"];
-    //config.env = j["Env"];
 
-    LOG_DEBUG
+    setField(j, "Hostname", &config.hostName);
+    setField(j, "Domainname", &config.domainName);
+    setField(j, "User", &config.user);
+    setField(j, "Image", &config.image);
+    setField(j, "WorkingDir", &config.workingDir);
+    //setField(j, "HostConfig", &config.hostConfig);
 
-    if (j["Cmd"] != nullptr) {
-        config.cmd = j["Cmd"];
-    }
-    else {
-        config.cmd = std::nullopt;
-    }
+    config.hostConfig = HostConfig::fromJson(j["HostConfig"]);
 
-    config.image = j["Image"];
-    config.workingDir = j["WorkingDir"];
+    std::cout << "HERE" << std::endl;
 
-    if (j["Entrypoint"] != nullptr) {
-        config.entrypoint = j["Entrypoint"];
-    }
-    else {
-        config.entrypoint = std::nullopt;
-    }
+    //cFieldg.exposedPorts = j["ExposedPorts"];
+    setField(j, "Env", &config.env);
+    setField(j, "Cmd", &config.cmd);
+    setField(j, "Entrypoint", &config.entrypoint);
+    setField(j, "NetworkDisabled", &config.networkDisabled);
+    setField(j, "Labels", &config.labels);
+    setField(j, "OnBuild", &config.onBuild);
+    setField(j, "Shell", &config.shell);
+    setField(j, "StopSignal", &config.stopSignal);
+    setField(j, "StopTimeout", &config.stopTimeout);
 
-    if (j["NetworkDisabled"] != nullptr) {
-        config.networkDisabled = j["NetworkDisabled"];
-    }
-    else {
-        config.networkDisabled = std::nullopt;
-    }
-
-    if (j["Labels"] != nullptr) {
-        config.labels = j["Labels"];
-    }
-    else {
-        config.labels = std::nullopt;
-    }
-
-    if (j["OnBuild"] != nullptr) {
-        config.onBuild = j["ObBuild"];
-    }
-    else {
-        config.onBuild = {};
-    }
-
-    if (j["Shell"] != nullptr) {
-        config.shell = j["Shell"];
-    }
-    else {
-        config.shell = {};
-    }
-
-    if (!j["StopSignal"].empty()) {
-        config.stopSignal = j["StopSignal"];
-    }
-
-    config.stopTimeout = j["StopTimeout"];
+    spdlog::trace("Finished parsing Json to ContainerConfig");
 
     return config;
 }

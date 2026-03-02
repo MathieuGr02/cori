@@ -8,18 +8,21 @@
 
 #include "spdlog/spdlog.h"
 
-template<>
-HttpResponse<std::string> HttpRequest::send<std::string>() {
+HttpResponse HttpRequest::send() const {
     std::string readBuffer;
     std::string methodString;
     std::string x;
 
-    curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &readBuffer);
     curl_easy_setopt(this->curl_, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(this->curl_, CURLOPT_WRITEDATA, &readBuffer);
 
-    spdlog::debug("Sending curl request");
+    curl_easy_setopt(this->curl_, CURLOPT_CONNECTTIMEOUT_MS, 5000L);
+    curl_easy_setopt(this->curl_, CURLOPT_TIMEOUT_MS, 5000L);
+
+    spdlog::trace("Sending curl request");
     CURLcode res = curl_easy_perform(this->curl_);
 
+    spdlog::trace("Curl response {}", static_cast<int>(res));
     if (res != CURLE_OK) {
         spdlog::error("Error during curl request");
         throw "";
@@ -28,15 +31,9 @@ HttpResponse<std::string> HttpRequest::send<std::string>() {
     long http_code = 0;
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_code);
 
-    return HttpResponse(http_code, readBuffer);
-}
+    std::cout << std::boolalpha << (readBuffer == "") << std::endl;
 
-template<>
-HttpResponse<json> HttpRequest::send<json>() {
-    HttpResponse<std::string> response = this->send<std::string>();
-    std::cout << response.getBody() << std::endl;
-    // Wasted double object creation. Change!
-    return HttpResponse(100, json::parse(response.getBody()));
+    return HttpResponse(http_code, readBuffer);
 }
 
 size_t HttpRequest::WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)

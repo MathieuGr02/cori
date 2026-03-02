@@ -10,20 +10,18 @@
 
 using json = nlohmann::json;
 
-template <typename T>
 class HttpResponse {
-private:
     HttpStatus status_;
-    T body;
+    std::string body;
 
 public:
-    HttpResponse(uint16_t code, T body):
+    HttpResponse(uint16_t code, std::string body):
         status_(static_cast<HttpStatus>(code)),
         body(std::move(body))
     {}
 
     [[nodiscard]]
-    T getBody() { return this->body; };
+    std::string getBody() { return this->body; };
 
     [[nodiscard]]
     HttpStatus getStatusCode() const { return this->status_; };

@@ -85,6 +85,14 @@ add_executable(cori main.cpp
         src/adapters/ssh/exceptions/SshConnectionException.h
         src/adapters/ssh/Ssh.cpp
         src/adapters/docker/ContainerConfig.h
+        src/adapters/docker/HostConfig.cpp
+        src/adapters/docker/HostConfig.h
+        src/adapters/docker/NetworkingConfig.cpp
+        src/adapters/docker/NetworkingConfig.h
+        src/adapters/docker/NetworkConfiguration.cpp
+        src/adapters/docker/NetworkConfiguration.h
+        src/types/Node.cpp
+        src/types/Node.h
 )
 
 
@@ -92,4 +100,5 @@ add_executable(cori main.cpp
 target_link_libraries(cori PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(cori PRIVATE spdlog::spdlog)
 target_link_libraries(cori PRIVATE ${CURL_LIBRARIES})
-target_link_libraries(cori PRIVATE libssh:libssh)
+target_link_libraries(cori PRIVATE ssh)
+target_include_directories(cori PRIVATE ${LIBSSH_LIBRARIES})

@@ -9,11 +9,12 @@
 #include <string>
 #include <vector>
 
+#include "NetworkingConfig.h"
+#include "PortMapping.h"
+#include "HostConfig.h"
 #include "../../util/JsonDeserializable.h"
 #include "../../util/JsonSerializable.h"
 
-
-class PortMapping;
 
 class ContainerConfig:
     public JsonDeserializable<ContainerConfig>,
@@ -23,12 +24,15 @@ public:
     std::optional<std::string> hostName;
     std::optional<std::string> domainName;
     std::optional<std::string> user;
+    std::optional<bool> attachStdin;
+    std::optional<bool> attachStdout;
+    std::optional<bool> attachStderr;
     std::optional<std::vector<PortMapping>> exposedPorts;
-    std::optional<std::map<std::string, std::string>> env;
+    std::optional<std::vector<std::string>> env;
     std::optional<std::vector<std::string>> cmd;
     //std::string healthcheck;
     std::optional<std::string> image;
-    //std::string volumes; //REQUIRES VOLUME OBJECT
+    std::optional<std::vector<std::string>> volumes; //REQUIRES VOLUME OBJECT
     std::optional<std::string> workingDir;
     std::optional<std::vector<std::string>> entrypoint;
     std::optional<bool> networkDisabled = false;
@@ -37,8 +41,8 @@ public:
     std::optional<std::string> stopSignal;
     std::optional<u_int64_t> stopTimeout = 10;
     std::optional<std::vector<std::string>> shell;
-    // hostConfig; //REQUIRES HOSTCONFIG OBJECT
-    // networkingConfig //REQUIRES NETWORKINGCONFIG OBJECT
+    std::optional<HostConfig> hostConfig;
+    std::map<std::string, std::optional<NetworkingConfig>> networks;
 
     static ContainerConfig fromJsonInternal(json j);
     json toJson() override;

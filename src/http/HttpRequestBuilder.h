@@ -27,13 +27,15 @@ public:
     HttpRequestBuilder& PUT();
     HttpRequestBuilder& DELETE();
 
-    HttpRequestBuilder& setHeaders(std::vector<std::string> headers);
+    HttpRequestBuilder& setHeaders(const std::vector<std::string> &headers);
     HttpRequestBuilder& addHeader(const std::string &header);
-    HttpRequestBuilder& setURI(const std::string &URI);
+    HttpRequestBuilder& setURL(const std::string &URL);
     HttpRequestBuilder& setUnixSocket(const std::string &socket);
 
-    HttpRequestBuilder& setBody(std::string body);
-private:
+    HttpRequestBuilder& setBody(const std::string &body);
+    HttpRequestBuilder& setVerbose();
+
+    CURL* getCurl();
 };
 
 

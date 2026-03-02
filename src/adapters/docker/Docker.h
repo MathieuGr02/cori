@@ -9,38 +9,47 @@
 #include <nlohmann/json.hpp>
 
 #include "ContainerInstance.h"
+#include "NetworkConfiguration.h"
 #include "../../http/HttpResponse.h"
 #include "../../http/RequestMethod.h"
 
 using json = nlohmann::json;
 
 class Docker {
-
+private:
+    std::optional<std::string> host;
+    std::optional<__uint16_t> port;
+    std::optional<std::string> socket;
 public:
+    Docker(): socket("/var/run/docker.sock") {}
+    Docker(std::string socket): socket(socket) {}
+    Docker(std::string host, __uint16_t port): host(host), port(port) {}
+
+
     // /containers
-    static std::vector<ContainerConfig> listContainers();
-    static ContainerInstance createContainer(ContainerConfig *container);
-    static void listContainerProcesses(std::string id);
-    static void getContainerLogs(std::string id);
-    static ContainerInstance getContainer(std::string id);
-    static void startContainer(std::string id);
-    static void stopContainer(std::string id);
-    static void deleteContainer(std::string id);
-    static void killContainer(std::string id);
+    std::vector<ContainerConfig> listContainers();
+    ContainerInstance createContainer(ContainerConfig *container);
+    void listContainerProcesses(std::string id);
+    void getContainerLogs(std::string id);
+    ContainerInstance getContainer(std::string id);
+    void startContainer(std::string id);
+    void stopContainer(std::string id);
+    void deleteContainer(std::string id);
+    void killContainer(std::string id);
 
     // /images
 
     // /networks
-    static void listNetworks();
-    static void deletenetwork();
-    static void createNetwork();
-    static void addContainerToNetwork();
-    static void removeContainerFromNetwork();
+    void listNetworks();
+    void deletenetwork();
+    void createNetwork(NetworkConfiguration network_configuration);
+    void addContainerToNetwork();
+    void removeContainerFromNetwork();
 
     // /volumes
 
 private:
-    HttpResponse<json> static sendRequest(RequestMethod method, const std::string &endpoint, const std::optional<std::string> &body = std::nullopt);
+    HttpResponse sendRequest(RequestMethod method, const std::string &endpoint, const std::optional<std::string> &body = std::nullopt);
 };
 
 

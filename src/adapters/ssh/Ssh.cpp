@@ -12,7 +12,7 @@ void Ssh::connect() {
     int rc = ssh_connect(this->session_);
 
     if (rc != SSH_OK) {
-        throw SshConnectionException(std::format("Unable to establish ssh connection %s", ssh_get_error(this->session_)));
+        throw SshConnectionException(std::format("Unable to establish ssh connection %s", ssh_get_error(this->session_)).c_str());
     }
 }
 
@@ -42,4 +42,12 @@ void Ssh::execute(std::string& cmd) {
     ssh_channel_send_eof(channel);
     ssh_channel_close(channel);
     ssh_channel_free(channel);
+}
+
+void Ssh::upload_directory() {
+
+}
+
+void Ssh::upload_file() {
+
 }

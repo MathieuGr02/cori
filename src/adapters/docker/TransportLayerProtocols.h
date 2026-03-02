@@ -8,8 +8,8 @@
 #include <string>
 #include <nlohmann/detail/macro_scope.hpp>
 
-#include "../util/JsonDeserializable.h"
-#include "../util/JsonSerializable.h"
+#include "../../util/JsonDeserializable.h"
+#include "../../util/JsonSerializable.h"
 
 class TransportLayerProtocol:
     public JsonDeserializable<TransportLayerProtocol>,

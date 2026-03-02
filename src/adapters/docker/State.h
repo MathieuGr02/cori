@@ -6,8 +6,8 @@
 #define CORI_STATE_H
 #include <string>
 
-#include "../util/JsonDeserializable.h"
-#include "../util/JsonSerializable.h"
+#include "../../util/JsonDeserializable.h"
+#include "../../util/JsonSerializable.h"
 
 
 class State:

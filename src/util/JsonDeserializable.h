@@ -7,6 +7,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "spdlog/spdlog.h"
+
 using json = nlohmann::json;
 
 template <typename T>
@@ -25,6 +27,27 @@ public:
         }
 
         return items;
+    }
+
+    // Set field to value of JSON field if present, otherwise default value;
+    template <typename S>
+    static void setField(json &j, const std::string &key, S *field, S default_value = S{}) {
+        if (j.contains(key) && !j[key].is_null()) {
+            spdlog::trace("Setting field. Key: {}", key);
+            *field = j[key];
+        }
+        else {
+            *field = default_value;
+        }
+    }
+
+    static void setField(json &j, const std::string &key, std::string* field, const std::string &default_value) {
+        if (j.contains(key)) {
+            *field = j[key];
+        }
+        else {
+            *field = default_value;
+        }
     }
 };
 

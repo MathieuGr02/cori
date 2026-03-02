@@ -8,9 +8,8 @@
 #include <nlohmann/json.hpp>
 
 #include "TransportLayerProtocols.h"
-#include "../Builder.h"
-#include "../util/JsonDeserializable.h"
-#include "../util/JsonSerializable.h"
+#include "../../util/JsonDeserializable.h"
+#include "../../util/JsonSerializable.h"
 
 using json = nlohmann::json;
 
