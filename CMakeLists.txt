@@ -27,6 +27,5 @@ find_package(libssh REQUIRED)
 add_subdirectory(src)
 add_subdirectory(cli)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC CORI_LIB)
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC include src)
-
+target_include_directories(cori_lib PUBLIC include)
+target_link_libraries(cori_cli PUBLIC cori_lib)

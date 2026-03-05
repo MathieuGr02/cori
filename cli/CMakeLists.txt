@@ -1,2 +1,5 @@
-add_executable(${CMAKE_PROJECT_NAME} main.cpp)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE CORI_LIB)
+project(cori_cli)
+
+add_executable(cori_cli main.cpp)
+
+target_link_libraries(cori_cli PRIVATE cori_lib)

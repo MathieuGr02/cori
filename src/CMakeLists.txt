@@ -1,4 +1,6 @@
-add_library(CORI_LIB
+project(cori_lib)
+
+add_library(cori_lib
         types/Object.cpp
         types/Object.h
         types/Store.cpp
@@ -66,9 +68,12 @@ add_library(CORI_LIB
         adapters/docker/PortBinding.h
 )
 
-target_include_directories(CORI_LIB PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(cori_lib PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/include
+)
 
-target_link_libraries(CORI_LIB
+target_link_libraries(cori_lib
         PUBLIC
         nlohmann_json::nlohmann_json
         spdlog::spdlog
