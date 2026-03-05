@@ -31,7 +31,7 @@ HttpResponse HttpRequest::send() const {
     long http_code = 0;
     curl_easy_getinfo(this->curl_, CURLINFO_RESPONSE_CODE, &http_code);
 
-    std::cout << std::boolalpha << (readBuffer == "") << std::endl;
+    std::cout << readBuffer << std::endl;
 
     return HttpResponse(http_code, readBuffer);
 }

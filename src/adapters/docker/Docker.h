@@ -16,15 +16,26 @@
 using json = nlohmann::json;
 
 class Docker {
-private:
     std::optional<std::string> host;
     std::optional<__uint16_t> port;
     std::optional<std::string> socket;
-public:
-    Docker(): socket("/var/run/docker.sock") {}
-    Docker(std::string socket): socket(socket) {}
-    Docker(std::string host, __uint16_t port): host(host), port(port) {}
+    std::optional<std::string> version;
 
+public:
+    Docker(
+        const std::optional<std::string> &host = std::nullopt,
+        const std::optional<__uint16_t> port = std::nullopt,
+        const std::optional<std::string> socket = "/var/run/docker.sock",
+        const std::optional<std::string> version = std::nullopt
+        ): host(host), port(port), socket(socket), version(version) {}
+
+    void setHost(std::string host);
+
+    void setPort(__uint16_t port);
+
+    void setSocket(std::string socket);
+
+    void setVersion(std::string version);
 
     // /containers
     std::vector<ContainerConfig> listContainers();

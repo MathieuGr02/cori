@@ -18,11 +18,12 @@ public:
 
     spdlog::level::level_enum log_level;
     bool curl_verbose;
+    std::optional<std::string> docker_api_version;
 
-    std::vector<Object> objects = {};
+    std::vector<Object> components = {};
 
-    void spawnObject(Spawnable* object);
-    void spawnObjectVec(std::vector<Spawnable*> objects);
+    void spawnComponent(Object* component);
+    void spawnComponentsVec();
 };
 
 

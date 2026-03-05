@@ -23,6 +23,16 @@
 class ContainerConfigBuilder;
 using json = nlohmann::json;
 
+void Docker::setHost(const std::string host) { this->host = host; }
+
+void Docker::setPort(const __uint16_t port) { this->port = port;}
+
+void Docker::setSocket(const std::string socket) { this->socket = socket; }
+
+void Docker::setVersion(const std::string version) {
+    this->version = version;
+}
+
 std::vector<ContainerConfig> Docker::listContainers() {
     HttpResponse result = sendRequest(GET, "/containers/json");
     json body = json::parse(result.getBody());
@@ -53,8 +63,28 @@ ContainerInstance Docker::getContainer(std::string id) {
 }
 
 ContainerInstance Docker::createContainer(ContainerConfig *container) {
-    spdlog::info("Creating container. Name: {}", container->hostName.value());
-    HttpResponse result = sendRequest(POST, "/containers/create",  container->toJson().dump());
+    spdlog::info("Creating container");
+
+    std::string endpoint = "/containers/create";
+    std::string query_parameters = "";
+
+    if (container->name.has_value()) {
+        query_parameters = std::format("name={}", container->name.value());
+    }
+    if (container->platform) {
+        if (query_parameters == "") {
+            query_parameters = std::format("platform={}", container->platform.value());
+        }
+        else {
+            query_parameters = std::format("{}&platform={}", query_parameters, container->platform.value());
+        }
+    }
+
+    if (query_parameters != "") {
+        endpoint = std::format("{}?{}", endpoint, query_parameters);
+    }
+
+    HttpResponse result = sendRequest(POST, endpoint,  container->toJson().dump());
 
     if (!result.success()) {
         spdlog::error("{}", static_cast<int>(result.getStatusCode()));
@@ -118,7 +148,19 @@ void Docker::createNetwork(NetworkConfiguration network_configuration) {
 }
 
 HttpResponse Docker::sendRequest(const RequestMethod method, const std::string &endpoint, const std::optional<std::string> &body) {
-    std::string URL = "http://localhost" + endpoint;
+    std::string URL = "http://localhost";
+
+    if (this->version.has_value()) {
+        URL = std::format("{}/{}",URL, this->version.value());
+    }
+
+    std::string formatted_endpoint = endpoint;
+    if (endpoint.starts_with("/")) {
+        formatted_endpoint = endpoint.substr(1, endpoint.size());
+    }
+
+    URL = std::format("{}/{}", URL, formatted_endpoint);
+
     spdlog::debug("Sending request to docker socket. URL: {}", URL);
 
     CURL* curl;

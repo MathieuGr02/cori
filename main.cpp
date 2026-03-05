@@ -9,10 +9,6 @@ using json = nlohmann::json;
 
 #define DEBUG true
 
-template <typename T>
-static T* getPointer(T& t) { return &t; }
-
-
 int main() {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -26,16 +22,18 @@ int main() {
     spdlog::info("Parsing config json to config");
     Config config = Config::fromJson(data);
 
-    spdlog::info("Setting log level {}", (int)config.log_level);
     spdlog::set_level(config.log_level);
 
     std::vector<Spawnable*> objects_pointers = {};
-    for (auto& object: config.objects) {
+    for (auto& object: config.components) {
         objects_pointers.push_back(&object);
     }
 
+    spdlog::info("{}", objects_pointers.size());
+
     spdlog::info("Spawning objects");
-    config.spawnObjectVec(objects_pointers);
+    config.spawnComponentsVec();
+    spdlog::info("Finished spawning objects");
 
     curl_global_cleanup();
 

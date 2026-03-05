@@ -33,8 +33,9 @@ Object Object::fromJsonInternal(json j) {
     object.node = Node::fromJson(j["Node"]);
     object.container_config = ContainerConfig::fromJson(j["ContainerConfig"]);
 
-    if (object.node.socket) {
-        object.docker = Docker(object.node.socket.value());
+    if (object.node.socket.has_value()) {
+        object.docker = Docker();
+        object.docker.setSocket(object.node.socket.value());
     }
 
     spdlog::debug("Finished parsing object");

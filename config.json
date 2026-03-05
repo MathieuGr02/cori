@@ -1,0 +1,40 @@
+{
+  "LogLevel": "TRACE",
+  "CurlVerbose": false,
+  "DockerAPIVersion": "v1.51",
+  "Objects": [
+    {
+      "Node": {
+        "Socket": "/home/mathieu/.docker/desktop/docker.sock"
+      },
+      "ContainerConfig": {
+        "Image": "docker:dind",
+        "Env": [
+          "DOCKER_TLS_CERTDIR:/certs"
+        ],
+        "ExposedPorts": {
+          "2375/tcp": {}
+        },
+        "HostConfig": {
+          "Privileged": true,
+          "PortBindings": {
+            "2375/tcp": [
+              {
+                "HostPort": "8000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "Node": {
+        "Socket": ""
+      },
+      "ContainerConfig": {
+        "Hostname": "python-test",
+        "Image": "python:3.12"
+      }
+    }
+  ]
+}

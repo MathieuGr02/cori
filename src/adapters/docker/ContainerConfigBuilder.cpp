@@ -23,7 +23,7 @@ ContainerConfigBuilder& ContainerConfigBuilder::setDomainName(std::string domain
     this->container_config_.domainName = domain_name;
     return *this;
 }
-
+/*
 ContainerConfigBuilder &ContainerConfigBuilder::setExposedPorts(std::vector<PortMapping> exposed_ports) {
     this->container_config_.exposedPorts = exposed_ports;
     return *this;
@@ -38,6 +38,7 @@ ContainerConfigBuilder& ContainerConfigBuilder::addExposedPort(PortMapping expos
     }
     return *this;
 }
+*/
 
 ContainerConfigBuilder &ContainerConfigBuilder::setEnv(std::vector<std::string> envs) {
     this->container_config_.env = envs;

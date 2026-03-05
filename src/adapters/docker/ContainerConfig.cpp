@@ -7,19 +7,19 @@
 #include <iostream>
 #include <sys/syslog.h>
 
-#include "PortMapping.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/bundled/chrono.h"
 
 json ContainerConfig::toJson() {
     json j;
 
-    spdlog::debug("Parsing ContainerConfig to JSON");
+    spdlog::trace("Parsing ContainerConfig to Json");
 
     j = setJson(j, "Hostname", &this->hostName);
     j = setJson(j, "Domainname", &this->domainName);
     j = setJson(j, "User", &this->user);
 
+    /*
     if (this->exposedPorts.has_value()) {
         for (auto &port: this->exposedPorts.value()) {
             std::string string_port = port.toString();
@@ -27,6 +27,7 @@ json ContainerConfig::toJson() {
             j["ExposedPorts"][string_port] = json({});
         }
     }
+    */
 
     j = setJson(j, "Env", &this->env);
     j = setJson(j, "Cmd", &this->cmd);
@@ -65,14 +66,18 @@ json ContainerConfig::toJson() {
     j = setJson(j, "AttachStdin", &this->attachStdin);
     j = setJson(j, "AttachStdout", &this->attachStdout);
 
+    spdlog::trace("Finished parsing ContainerConfig to Json");
+
     return j;
 }
 
 ContainerConfig ContainerConfig::fromJsonInternal(json j) {
-    spdlog::trace("Parsing JSON to ContainerConfig");
+    spdlog::trace("Parsing Json to ContainerConfig");
 
     ContainerConfig config = ContainerConfig();
 
+    setField(j, "Name", &config.name);
+    setField(j, "Platform", &config.platform);
     setField(j, "Hostname", &config.hostName);
     setField(j, "Domainname", &config.domainName);
     setField(j, "User", &config.user);
@@ -80,9 +85,9 @@ ContainerConfig ContainerConfig::fromJsonInternal(json j) {
     setField(j, "WorkingDir", &config.workingDir);
     //setField(j, "HostConfig", &config.hostConfig);
 
-    config.hostConfig = HostConfig::fromJson(j["HostConfig"]);
-
-    std::cout << "HERE" << std::endl;
+    if (j.contains("HostConfig")) {
+        config.hostConfig = HostConfig::fromJson(j["HostConfig"]);
+    }
 
     //cFieldg.exposedPorts = j["ExposedPorts"];
     setField(j, "Env", &config.env);

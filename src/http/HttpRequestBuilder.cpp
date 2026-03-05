@@ -94,8 +94,6 @@ HttpRequestBuilder &HttpRequestBuilder::DELETE() {
 }
 
 HttpRequestBuilder &HttpRequestBuilder::setBody(const std::string &body) {
-    std::cout << body << std::endl;
-
     int res = curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, body.data());
     if (res != CURLE_OK) {
         spdlog::error("Error while setting request body. Error {}", res);

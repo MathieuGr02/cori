@@ -33,7 +33,7 @@ public:
     template <typename S>
     static void setField(json &j, const std::string &key, S *field, S default_value = S{}) {
         if (j.contains(key) && !j[key].is_null()) {
-            spdlog::trace("Setting field. Key: {}", key);
+            spdlog::trace("Setting class field. Key: {}", key);
             *field = j[key];
         }
         else {

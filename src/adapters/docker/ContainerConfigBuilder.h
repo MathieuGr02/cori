@@ -5,8 +5,6 @@
 #ifndef CORI_CONTAINERCONFIGBUILDER_H
 #define CORI_CONTAINERCONFIGBUILDER_H
 
-#include "PortMapping.h"
-
 #include <nlohmann/json.hpp>
 
 #include "ContainerConfig.h"
@@ -25,8 +23,8 @@ public:
 
     ContainerConfigBuilder& setHostName(std::string host_name);
     ContainerConfigBuilder& setDomainName(std::string domain_name);
-    ContainerConfigBuilder& setExposedPorts(std::vector<PortMapping> exposed_ports);
-    ContainerConfigBuilder& addExposedPort(PortMapping exposed_port);
+    //ContainerConfigBuilder& setExposedPorts(std::vector<PortMapping> exposed_ports);
+    //ContainerConfigBuilder& addExposedPort(PortMapping exposed_port);
     ContainerConfigBuilder& setEnv(std::vector<std::string> envs);
     ContainerConfigBuilder& addEnv(std::string key, std::string value);
     ContainerConfigBuilder& setLabels(std::map<std::string, std::string> labels);

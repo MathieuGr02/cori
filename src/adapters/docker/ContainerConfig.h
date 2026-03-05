@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "NetworkingConfig.h"
-#include "PortMapping.h"
 #include "HostConfig.h"
 #include "../../util/JsonDeserializable.h"
 #include "../../util/JsonSerializable.h"
@@ -21,13 +20,17 @@ class ContainerConfig:
     public JsonSerializable
 {
 public:
+    // Query parameters
+    std::optional<std::string> name;
+    std::optional<std::string> platform;
+
+    // Body parameters
     std::optional<std::string> hostName;
     std::optional<std::string> domainName;
     std::optional<std::string> user;
     std::optional<bool> attachStdin;
     std::optional<bool> attachStdout;
     std::optional<bool> attachStderr;
-    std::optional<std::vector<PortMapping>> exposedPorts;
     std::optional<std::vector<std::string>> env;
     std::optional<std::vector<std::string>> cmd;
     //std::string healthcheck;
@@ -36,6 +39,7 @@ public:
     std::optional<std::string> workingDir;
     std::optional<std::vector<std::string>> entrypoint;
     std::optional<bool> networkDisabled = false;
+    std::optional<std::vector<std::string>> exposedPorts;
     std::optional<std::vector<std::string>> onBuild;
     std::optional<std::map<std::string, std::string>> labels;
     std::optional<std::string> stopSignal;

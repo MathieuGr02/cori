@@ -1,0 +1,77 @@
+add_library(CORI_LIB
+        types/Object.cpp
+        types/Object.h
+        types/Store.cpp
+        types/Store.h
+        adapters/docker/ContainerInstance.cpp
+        adapters/docker/ContainerInstance.h
+        adapters/docker/Docker.cpp
+        adapters/docker/Docker.h
+        adapters/docker/ContainerConfigBuilder.cpp
+        adapters/docker/ContainerConfigBuilder.h
+        util/JsonSerializable.cpp
+        util/JsonSerializable.h
+        util/JsonDeserializable.cpp
+        util/JsonDeserializable.h
+        util/util.cpp
+        util/util.h
+        adapters/docker/TransportLayerProtocols.cpp
+        adapters/docker/TransportLayerProtocols.h
+        adapters/docker/State.cpp
+        adapters/docker/State.h
+        adapters/docker/ContainerConfig.cpp
+        adapters/docker/ContainerConfig.h
+        http/HttpResponse.cpp
+        http/HttpResponse.h
+        http/HttpStatus.cpp
+        http/HttpStatus.h
+        http/HttpRequest.cpp
+        http/HttpRequest.h
+        http/HttpRequestBuilder.cpp
+        http/HttpRequestBuilder.h
+        adapters/docker/exceptions/ContainerAlreadyExistsException.cpp
+        adapters/docker/exceptions/ContainerAlreadyExistsException.h
+        adapters/docker/exceptions/NoSuchImageException.cpp
+        adapters/docker/exceptions/NoSuchImageException.h
+        adapters/docker/exceptions/DockerException.cpp
+        adapters/docker/exceptions/DockerException.h
+        adapters/docker/exceptions/InvalidConfigException.cpp
+        adapters/docker/exceptions/InvalidConfigException.h
+        adapters/docker/exceptions/ContainerDoesntExistException.cpp
+        adapters/docker/exceptions/ContainerDoesntExistException.h
+        http/RequestMethod.cpp
+        http/RequestMethod.h
+        types/Spawnable.cpp
+        types/Spawnable.h
+        types/Uploader.cpp
+        types/Uploader.h
+        adapters/ssh/Ssh.cpp
+        adapters/ssh/Ssh.h
+        Config.cpp
+        Config.h
+        adapters/ssh/exceptions/SshConnectionException.cpp
+        adapters/ssh/exceptions/SshConnectionException.h
+        adapters/ssh/Ssh.cpp
+        adapters/docker/ContainerConfig.h
+        adapters/docker/HostConfig.cpp
+        adapters/docker/HostConfig.h
+        adapters/docker/NetworkingConfig.cpp
+        adapters/docker/NetworkingConfig.h
+        adapters/docker/NetworkConfiguration.cpp
+        adapters/docker/NetworkConfiguration.h
+        types/Node.cpp
+        types/Node.h
+        adapters/docker/PortBinding.cpp
+        adapters/docker/PortBinding.h
+        adapters/docker/PortBinding.h
+)
+
+target_include_directories(CORI_LIB PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+target_link_libraries(CORI_LIB
+        PUBLIC
+        nlohmann_json::nlohmann_json
+        spdlog::spdlog
+        CURL::libcurl
+        ssh
+)
